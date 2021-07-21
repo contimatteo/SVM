@@ -1,9 +1,29 @@
 import numpy as np
+from sklearn.model_selection import train_test_split
 
 ###
 
 
-class Dataset:
+class DatasetUtils:
+    @staticmethod
+    def shuffle(X, Y):
+        indices = np.arange(X.shape[0])
+        np.random.shuffle(indices)
+
+        return X[indices], Y[indices]
+
+    @staticmethod
+    def split(X, Y, train_size=0.8):
+        return train_test_split(X, Y, train_size=train_size)
+
+
+###
+
+
+class DatasetGenerator:
+
+    #
+
     @staticmethod
     def linear():
         N_POINTS_TOT = 200
@@ -22,7 +42,7 @@ class Dataset:
         Y_class1 = np.full(N_POINTS_FOR_CLASS, 1)
         Y_class2 = np.full(N_POINTS_FOR_CLASS, -1)
 
-        # X = np.concatenate((X_class1, X_class2))
-        # Y = np.concatenate((Y_class1, Y_class2))
+        X = np.concatenate((X_class1, X_class2))
+        Y = np.concatenate((Y_class1, Y_class2))
 
-        return X_class1, Y_class1, X_class2, Y_class2
+        return DatasetUtils.shuffle(X, Y)
