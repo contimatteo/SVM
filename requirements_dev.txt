@@ -3,6 +3,7 @@
 ## pip     (21.1.1) ##
 ######################
 
+cvxopt
 matplotlib
 numpy
 scikit-learn
