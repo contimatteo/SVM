@@ -1,0 +1,11 @@
+######################
+## python  (3.8.5)  ##
+## pip     (21.1.1) ##
+######################
+
+matplotlib
+numpy
+scikit-learn
+
+pylint
+yapf
