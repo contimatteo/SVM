@@ -40,26 +40,28 @@ class SVM():
          - b = 0 (number)
         """
 
-        N = X.shape[0]
+        # {cvxopt} array types compatibility.
+        points = X.copy().astype(np.double)
+        classes = Y.copy().astype(np.double)
 
-        P_raw = np.dot(X, X.T) * np.outer(Y, Y.T)
-        q_raw = np.ones(N) * -1
+        N = classes.shape[0]
+
+        # {cvxopt} Parameters Formulation
+        P_raw = np.outer(classes, classes.T) * np.dot(points, points.T)
+        q_raw = -1 * np.full(N, 1)
         G_raw = -1 * np.identity(N)
-        h_raw = np.zeros(N)
-        A_raw = Y
-        b_raw = np.zeros(N)
+        h_raw = np.full(N, 0)
+        A_raw = classes
+        b_raw = .0
 
-        print()
-        print()
-        print(f"[INFO] P_raw.shape = {P_raw.shape}")
-        print(f"[INFO] q_raw.shape = {q_raw.shape}")
-        print(f"[INFO] G_raw.shape = {G_raw.shape}")
-        print(f"[INFO] h_raw.shape = {h_raw.shape}")
-        print(f"[INFO] A_raw.shape = {A_raw.shape}")
-        print(f"[INFO] b_raw.shape = {b_raw.shape}")
-        print()
-        print()
+        # {cvxopt} matrix shape compatibility.
+        A_raw = A_raw.reshape((1, N))
+        # {cvxopt} array types compatibility.
+        q_raw = q_raw.astype(np.double)
+        G_raw = G_raw.astype(np.double)
+        h_raw = h_raw.astype(np.double)
 
+        # {cvxopt} casting required.
         P = cvxopt.matrix(P_raw)
         q = cvxopt.matrix(q_raw)
         G = cvxopt.matrix(G_raw)
@@ -73,8 +75,6 @@ class SVM():
         # solve QP problem
         P, q, G, h, A, b = self.__cvxopt_formulation(X, Y)
         solution = cvxopt.solvers.qp(P, q, G, h, A, b)
-
-        pass
 
     def predict(self, X_test):
         return []
