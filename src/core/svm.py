@@ -42,12 +42,23 @@ class SVM():
 
         N = X.shape[0]
 
-        P_raw = np.outer(np.dot(X, X.T), np.dot(Y, Y.T))
-        q_raw = -1 * np.identity(N).T
+        P_raw = np.dot(X, X.T) * np.outer(Y, Y.T)
+        q_raw = np.ones(N) * -1
         G_raw = -1 * np.identity(N)
         h_raw = np.zeros(N)
         A_raw = Y
         b_raw = np.zeros(N)
+
+        print()
+        print()
+        print(f"[INFO] P_raw.shape = {P_raw.shape}")
+        print(f"[INFO] q_raw.shape = {q_raw.shape}")
+        print(f"[INFO] G_raw.shape = {G_raw.shape}")
+        print(f"[INFO] h_raw.shape = {h_raw.shape}")
+        print(f"[INFO] A_raw.shape = {A_raw.shape}")
+        print(f"[INFO] b_raw.shape = {b_raw.shape}")
+        print()
+        print()
 
         P = cvxopt.matrix(P_raw)
         q = cvxopt.matrix(q_raw)

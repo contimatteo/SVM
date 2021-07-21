@@ -15,7 +15,7 @@ np.random.seed(CONFIG.RANDOM_SEED)
 def main():
     X, Y = dataset = DatasetGenerator.linear()
 
-    X_train, Y_train, X_test, _ = DatasetUtils.split(X, Y)
+    X_train, X_test, Y_train, _ = DatasetUtils.split(X, Y)
 
     #
 
