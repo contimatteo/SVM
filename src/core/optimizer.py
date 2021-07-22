@@ -5,7 +5,7 @@ import numpy as np
 
 
 class Optimizer():
-    def __cvxopt_formulation(self, X, Y, kernel):
+    def __cvxopt_formulation(self, points, classes, kernel):
         """
         Lagrangian Formulation \\
         `min L(w,b)` \\
@@ -45,10 +45,6 @@ class Optimizer():
          - A = Y
          - b = 0 (number)
         """
-
-        ### {cvxopt} array types compatibility.
-        # points = X.copy().astype(np.double)
-        classes = Y.copy().astype(np.double)
 
         ### number of Lagrangian multipliers parameters.
         N = classes.shape[0]

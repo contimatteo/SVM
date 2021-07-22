@@ -43,6 +43,6 @@ class DatasetGenerator:
         Y_class2 = np.full(N_POINTS_FOR_CLASS, -1)
 
         X = np.concatenate((X_class1, X_class2))
-        Y = np.concatenate((Y_class1, Y_class2))
+        Y = np.concatenate((Y_class1, Y_class2)).astype(np.double)
 
         return DatasetUtils.shuffle(X, Y)
