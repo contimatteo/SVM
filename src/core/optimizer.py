@@ -77,7 +77,7 @@ class Optimizer():
     #
 
     def initialize(self):
-        pass
+        cvxopt.solvers.options['show_progress'] = False
 
     def cvxopt_solve(self, points, classes, kernel):
         P, q, G, h, A, b = self.__cvxopt_formulation(points, classes, kernel)
