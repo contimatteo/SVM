@@ -1,4 +1,3 @@
-import cvxopt
 import numpy as np
 
 from core.kernel import Kernel
@@ -12,13 +11,14 @@ class SVM():
         self._kernel = None
         self._kernel_function = Kernel.linear
 
+        self._multipliers = None
         self._lambdas = None
         self._bias = None
         self._w = None
 
         self._sv = None
-        self._sv_kernel = None
         self._sv_Y = None
+        self._sv_idxs = None
 
     #
 
@@ -55,20 +55,19 @@ class SVM():
         solution = optimizer.cvxopt_solve(X, Y, self._kernel)
 
         ###  lagrangian multipliers
-        multipliers = SVMCore.extract_multipliers(solution)
+        self._multipliers = SVMCore.extract_multipliers(solution)
 
-        sv_idxs = SVMCore.extract_support_vectors_indexes(multipliers)
+        self._sv_idxs = SVMCore.extract_support_vectors_indexes(self._multipliers)
 
         ###  lambda params (filtered multipliers)
-        self._lambdas = multipliers[sv_idxs]
+        self._lambdas = self._multipliers[self._sv_idxs]
 
         ###  support vectors
-        self._sv = X[sv_idxs]
-        self._sv_Y = Y[sv_idxs]
-        self._sv_kernel = SVMCore.compute_kernel(self._kernel_function, self._sv)
+        self._sv = X[self._sv_idxs]
+        self._sv_Y = Y[self._sv_idxs]
 
         ###  bias
-        self._bias = SVMCore.compute_bias(self._lambdas, self._sv_kernel, self._sv_Y)
+        self._bias = SVMCore.compute_bias(self._lambdas, self._kernel, self._sv_Y, self._sv_idxs)
 
         ### w (hyperplane equation coefficients)
         self._w = SVMCore.compute_hyperplane_coefficients(self._lambdas, self._sv, self._sv_Y)
@@ -102,52 +101,21 @@ class SVMCore():
         `xi` have the corresponding `λi = 0` have no effect on the classifier.
         """
         zero_threshold = 1e-5
-        return multipliers > zero_threshold
+        bool_idxs = multipliers > zero_threshold
+        return np.arange(multipliers.shape[0])[bool_idxs]
 
     @staticmethod
-    def compute_bias(lambdas, kernel, Y):
+    def compute_bias(lambdas, kernel, Y, sv_idxs):
         """
-        given the equation of the hyperplane \\
-        `f(x) = (W * X) + b`
-
-        we know from the partial derivative of the primal Lagrangian 
-        formulation and by the application of the KKT (1) condition \\
-        `w = λ * Y * X`
-
-        as a conseguence, the equation of the hyperplane becomes  \\
-        `f(x) = ((λ * Y * X) * X) + b`
-
-        
-        given that `X * X` is replaced by the Kernel 
-        function and given that `f(x) = 1/|λ|`
-        
-        we obtain the following \\
-        `f(x) = (λ * Y * Kernel) + b`
-
-        and now we can extract the bias \\
-        `b = f(x) - ((λ * Y * X) * X)`
-
-        // TODO: missing explaination of the following computations \\
-        // ...
+        `TODO: missing explaination of the following computations` \\
+        `...`
         """
+        bias = 0
+        for n in range(lambdas.shape[0]):
+            bias += Y[n] - np.sum(lambdas * Y * kernel[sv_idxs[n], sv_idxs])
+        bias /= lambdas.shape[0]
 
-        ### TODO: why {b} parameter is formulated as follow?
-        # ...
-
-        ### TODO: remote the following simplification
-        ### from
-        ### ->  b = 1/|λ| * ∑ (Y - ∑ (λ * Y * Kernel))
-        ### to
-        ### -> c1 = 1 / |λ|
-        ###    c2 = ∑ (λ * Y * Kernel)
-        ###    c3 = ∑ (Y - c2)
-        ###     b = c1 * c3
-
-        c1 = 1 / lambdas.shape[0]
-        c2 = np.array(lambdas * Y * kernel).sum()
-        c3 = np.array(Y - c2).sum()
-
-        return c1 * c3
+        return bias
 
     @staticmethod
     def compute_hyperplane_coefficients(lambdas, X, Y):
