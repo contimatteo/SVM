@@ -33,35 +33,28 @@ class Plotter:
         plt.show()
 
     @staticmethod
-    def svm(dataset, svm):
-        X, Y = dataset
+    def svm(X, Y, svm):
+        colors = Plotter.__colors_from_classes(Y)
         support_vectors = svm.support_vectors
 
-        plt.scatter(support_vectors[:, 0], support_vectors[:, 1], s=50, c="g")
+        x1_limit = np.min(support_vectors[:, 0])
+        x2_limit = np.max(support_vectors[:, 0])
 
-        # # Plot the lines
+        ### w.x + b = 0
+        margin_xy1 = [x1_limit, svm.hyperplane_equation(x1_limit, 0)]
+        margin_xy2 = [x2_limit, svm.hyperplane_equation(x2_limit, 0)]
+        ### w.x + b = 1
+        up_margin_xy1 = [x1_limit, svm.hyperplane_equation(x1_limit, 1)]
+        up_margin_xy2 = [x2_limit, svm.hyperplane_equation(x2_limit, 1)]
+        ### w.x + b = -1
+        low_margin_xy1 = [x1_limit, svm.hyperplane_equation(x1_limit, -1)]
+        low_margin_xy2 = [x2_limit, svm.hyperplane_equation(x2_limit, -1)]
 
-        # # w.x + b = 0
-        # a0 = -4
-        # a1 = f(a0, weight, bias)
-        # b0 = 4
-        # b1 = f(b0, weight, bias)
-        # plt.plot([a0, b0], [a1, b1], "k")
+        plt.scatter(X[:, 0], X[:, 1], color=colors)
+        plt.scatter(support_vectors[:, 0], support_vectors[:, 1], s=100, c="C4")
+        plt.axline(margin_xy1, margin_xy2)
+        plt.axline(up_margin_xy1, up_margin_xy2)
+        plt.axline(low_margin_xy1, low_margin_xy2)
 
-        # # w.x + b = 1
-        # a0 = -4
-        # a1 = f(a0, weight, bias, 1)
-        # b0 = 4
-        # b1 = f(b0, weight, bias, 1)
-        # plt.plot([a0, b0], [a1, b1], "k--")
-
-        # # w.x + b = -1
-        # a0 = -4
-        # a1 = f(a0, weight, bias, -1)
-        # b0 = 4
-        # b1 = f(b0, weight, bias, -1)
-        # plt.plot([a0, b0], [a1, b1], "k--")
-
-        # plt.axis("tight")
-
+        plt.axis("tight")
         plt.show()

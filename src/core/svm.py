@@ -12,7 +12,6 @@ class SVM():
         self._kernel = None
         self._kernel_function = Kernel.linear
 
-        self._hyperplane = None
         self._lambdas = None
         self._bias = None
         self._w = None
@@ -27,8 +26,23 @@ class SVM():
     def support_vectors(self):
         return self._sv
 
+    @property
+    def weights(self):
+        return self._w
+
+    @property
+    def bias(self):
+        return self._bias
+
+    #
+
     def project_to_hyperplane(self, points):
-        return self._hyperplane(points)
+        return SVMCore.hyperplane_projection_function(self._w, self._bias)(points)
+
+    def hyperplane_equation(self, x1, c=0):
+        return SVMCore.hyperplane_equation(self._w, self._bias)(x1, c)
+
+    #
 
     def fit(self, X, Y):
         ###  compute the kernel
@@ -59,11 +73,9 @@ class SVM():
         ### w (hyperplane equation coefficients)
         self._w = SVMCore.compute_hyperplane_coefficients(self._lambdas, self._sv, self._sv_Y)
 
-        ### hyperplane function
-        self._hyperplane = SVMCore.hyperplane_function(self._w, self._bias)
-
     def predict(self, X_test):
-        return []
+        projections = self.project_to_hyperplane(X_test)
+        return np.sign(projections)
 
 
 ###
@@ -89,7 +101,7 @@ class SVMCore():
         `λi` strictly positive are named support vectors. All other points 
         `xi` have the corresponding `λi = 0` have no effect on the classifier.
         """
-        zero_threshold = 1e-10
+        zero_threshold = 1e-5
         return multipliers > zero_threshold
 
     @staticmethod
@@ -160,12 +172,26 @@ class SVMCore():
         return np.sum(coefficients_to_sum, axis=1)
 
     @staticmethod
-    def hyperplane_function(coefficients, bias):
+    def hyperplane_projection_function(coefficients, bias):
         """
-        given the hyperplane equation
+        given the hyperplane equation \\
         `f(x) = (w * X) + b`
         """
         def project_to_hyperplane(coefficients, bias, points):
             return np.dot(points, coefficients) + bias
 
         return lambda X: project_to_hyperplane(coefficients, bias, X)
+
+    @staticmethod
+    def hyperplane_equation(coefficients, bias):
+        """
+        given the hyperplane equation (where the default value of `c` is 0) \\
+        `w1 * x1 + w2 * x2 + b = c`
+
+        we obtain 
+        `x2 = (-w1 * x1 - b + c) / w2`
+        """
+        def equation(w, b, x1, c):
+            return (-w[0] * x1 - b + c) / w[1]
+
+        return lambda x1, c: equation(coefficients, bias, x1, c)

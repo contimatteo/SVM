@@ -13,7 +13,7 @@ np.random.seed(CONFIG.RANDOM_SEED)
 
 
 def main():
-    X, Y = dataset = DatasetGenerator.linear()
+    X, Y = DatasetGenerator.linear()
 
     X_train, X_test, Y_train, _ = DatasetUtils.split(X, Y)
 
@@ -27,13 +27,9 @@ def main():
 
     svm.fit(X_train, Y_train)
 
-    _ = svm.predict(X_test)
+    Y_train_predicted = svm.predict(X_train)
 
-    ###
-
-    Y_train_predicted = np.sign(svm.project_to_hyperplane(X_train))
-
-    Plotter.svm((X_train, Y_train_predicted), svm)
+    Plotter.svm(X_train, Y_train_predicted, svm)
 
     ###
 
