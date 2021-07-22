@@ -17,7 +17,11 @@ def main():
 
     X_train, X_test, Y_train, _ = DatasetUtils.split(X, Y)
 
-    #
+    ###
+
+    # Plotter.data(X_train, Y_train)
+
+    ###
 
     svm = SVM()
 
@@ -25,11 +29,13 @@ def main():
 
     _ = svm.predict(X_test)
 
-    #
+    ###
 
-    # Plotter.data_and_plane(dataset)
+    Y_train_predicted = np.sign(svm.project_to_hyperplane(X_train))
 
-    #
+    Plotter.svm((X_train, Y_train_predicted), svm)
+
+    ###
 
 
 ###
