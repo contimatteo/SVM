@@ -27,7 +27,7 @@ def main():
 
     #
 
-    Plotter.data_and_plane(dataset)
+    # Plotter.data_and_plane(dataset)
 
     #
 
