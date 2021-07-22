@@ -55,7 +55,6 @@ class Optimizer():
 
         # {cvxopt} Parameters Formulation
         P_raw = np.outer(classes, classes.T) * kernel
-        # P_raw = np.outer(classes, classes.T) * kernel(points, points.T)
         q_raw = np.full(N, 1) * -1
         G_raw = np.identity(N) * -1
         h_raw = np.full(N, 0)
