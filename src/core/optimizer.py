@@ -27,7 +27,7 @@ class Optimizer():
         In order to obtain a MIN problem, we start from the dual and we multiply
         by -1 the entire objective function `F(λ)`.
 
-        Dual Problem as Minimization Problem \\
+        Lagrangian Dual Problem as Minimization Problem \\
         `min -F(λ)` \\
         `-F(λ) = 1/2 * (∑ ∑ λi * λj * yi * yj * xi * xj) - ∑ λi`
 

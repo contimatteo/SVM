@@ -13,13 +13,18 @@ np.random.seed(CONFIG.RANDOM_SEED)
 
 
 def main():
-    X, Y = DatasetGenerator.linear()
+    # X, Y = DatasetGenerator.random()
+    # X, Y = DatasetGenerator.linear()
+    X, Y = DatasetGenerator.non_linear1()
+    # X, Y = DatasetGenerator.non_linear2()
+    # X, Y = DatasetGenerator.non_linear3()
+    # X, Y = DatasetGenerator.non_linear4()
 
     X_train, _, Y_train, _ = DatasetUtils.split(X, Y)
 
     ###
 
-    # Plotter.data(X_train, Y_train)
+    Plotter.data(X_train, Y_train)
 
     ###
 
