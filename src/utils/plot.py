@@ -13,9 +13,7 @@ class Plotter:
         return np.array([color_from_class(y) for y in Y])
 
     @staticmethod
-    def data(dataset):
-        X, Y = dataset
-
+    def data(X, Y):
         colors = Plotter.__colors_from_classes(Y)
 
         plt.scatter(X[:, 0], X[:, 1], color=colors)
