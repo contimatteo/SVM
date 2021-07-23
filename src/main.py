@@ -1,8 +1,9 @@
 import numpy as np
 
-from core.svm import SVM
 import utils.configs as CONFIG
-from utils.datasets import DatasetGenerator, DatasetUtils
+
+from core.svm import SVM
+from utils.dataset import DatasetGenerator, DatasetUtils
 from utils.plot import Plotter
 
 ###
@@ -11,19 +12,37 @@ np.random.seed(CONFIG.RANDOM_SEED)
 
 ###
 
+###
+### TODO: MISSING TASKS
+###
+### [x] add soft-margin formulation
+### [ ] add multiple kernels support
+### [ ] re-write all problem equation/formulas in the comments
+### [ ] export the dataset used
+### [ ] find a way for unifying plots
+###
+
+###
+
 
 def main():
-    X, Y = DatasetGenerator.linear()
+    # X, Y = DatasetGenerator.random()
+    # X, Y = DatasetGenerator.linear()
+    X, Y = DatasetGenerator.non_linear1()
+    # X, Y = DatasetGenerator.non_linear2()
+    # X, Y = DatasetGenerator.non_linear3()
+    # X, Y = DatasetGenerator.non_linear4()
 
     X_train, _, Y_train, _ = DatasetUtils.split(X, Y)
 
     ###
 
-    # Plotter.data(X_train, Y_train)
+    Plotter.data(X_train, Y_train)
 
     ###
 
-    svm = SVM()
+    # svm = SVM()
+    svm = SVM(C=1.)
 
     svm.fit(X_train, Y_train)
 
