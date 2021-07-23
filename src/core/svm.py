@@ -7,7 +7,7 @@ from core.optimizer import Optimizer
 
 
 class SVM():
-    def __init__(self):
+    def __init__(self, C=None):
         self._kernel = None
         self._kernel_function = Kernel.linear
 
@@ -19,6 +19,8 @@ class SVM():
         self._sv = None
         self._sv_Y = None
         self._sv_idxs = None
+
+        self.C = C
 
     #
 
@@ -52,7 +54,11 @@ class SVM():
         optimizer.initialize()
 
         ###  QP problem solution
-        solution = optimizer.cvxopt_solve(X, Y, self._kernel)
+        solution = None
+        if self.C:
+            solution = optimizer.cvxopt_soft_margin_solve(Y, self._kernel, self.C)
+        else:
+            solution = optimizer.cvxopt_hard_margin_solve(Y, self._kernel)
 
         ###  lagrangian multipliers
         self._multipliers = SVMCore.extract_multipliers(solution)
@@ -107,8 +113,7 @@ class SVMCore():
     @staticmethod
     def compute_bias(lambdas, kernel, Y, sv_idxs):
         """
-        `TODO: missing explaination of the following computations` \\
-        `...`
+        TODO: missing explaination of the following computations
         """
         bias = 0
         for n in range(lambdas.shape[0]):

@@ -1,13 +1,26 @@
 import numpy as np
 
-from core.svm import SVM
 import utils.configs as CONFIG
-from utils.datasets import DatasetGenerator, DatasetUtils
+
+from core.svm import SVM
+from utils.dataset import DatasetGenerator, DatasetUtils
 from utils.plot import Plotter
 
 ###
 
 np.random.seed(CONFIG.RANDOM_SEED)
+
+###
+
+###
+### TODO: MISSING TASKS
+###
+### [x] add soft-margin formulation
+### [ ] add multiple kernels support
+### [ ] re-write all problem equation/formulas in the comments
+### [ ] export the dataset used
+### [ ] find a way for unifying plots
+###
 
 ###
 
@@ -28,7 +41,8 @@ def main():
 
     ###
 
-    svm = SVM()
+    # svm = SVM()
+    svm = SVM(C=1.)
 
     svm.fit(X_train, Y_train)
 

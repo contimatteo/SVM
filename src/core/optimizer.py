@@ -5,8 +5,10 @@ import numpy as np
 
 
 class Optimizer():
-    def __cvxopt_formulation(self, points, classes, kernel):
+    def __cvxopt_hard_formulation(self, kernel, classes):
         """
+        TODO: re-write the formulation below ...
+
         Lagrangian Formulation \\
         `min L(w,b)` \\
         `max L(λ)` \\
@@ -50,37 +52,134 @@ class Optimizer():
         N = classes.shape[0]
 
         # {cvxopt} Parameters Formulation
-        P_raw = np.outer(classes, classes.T) * kernel
-        q_raw = np.full(N, 1) * -1
-        G_raw = np.identity(N) * -1
-        h_raw = np.full(N, 0)
-        A_raw = classes
-        b_raw = .0
+        P = np.outer(classes, classes.T) * kernel
+        q = np.full(N, 1) * -1
+        G = np.identity(N) * -1
+        h = np.full(N, 0)
+        A = classes
+        b = .0
 
         ### {cvxopt} matrix shape compatibility (for moltiplication).
-        A_raw = A_raw.reshape((1, N))
+        A = A.reshape((1, N))
         ###  {cvxopt} array types compatibility.
-        q_raw = q_raw.astype(np.double)
-        G_raw = G_raw.astype(np.double)
-        h_raw = h_raw.astype(np.double)
-
-        ###  {cvxopt} casting required.
-        P = cvxopt.matrix(P_raw)
-        q = cvxopt.matrix(q_raw)
-        G = cvxopt.matrix(G_raw)
-        h = cvxopt.matrix(h_raw)
-        A = cvxopt.matrix(A_raw)
-        b = cvxopt.matrix(b_raw)
+        q = q.astype(np.double)
+        G = G.astype(np.double)
+        h = h.astype(np.double)
 
         return (P, q, G, h, A, b)
+
+    #
+
+    def __cvxopt_soft_formulation(self, kernel, classes, C):
+        """
+        Objective Function \\
+        `min (1/2 ||W||^2) + (C • ∑ ξ)`
+
+        Constraints \\
+        `∀i . yi (xi • W + b) -1 + ξ ≥ 0`
+
+        Primal Lagrangian Formulation \\
+        `min Lp(w,b)` \\
+        `max Ld(λ)` \\
+        `L(w, b, λ) = (1/2 ||W||^2) + (C ∑ ξi) - (∑ λi yi (xi • W + b) - 1 + ξi) - (∑ μi ξi)`
+
+        Bordered Hessian \\
+        `H = (Y • Y.T) (X.T • X)`
+
+        Dual Lagrangian Formulation \\
+        `max Ld(λ)` \\
+        `F(λ) = ∑ λi - 1/2 (λ • H • λ.T)`
+        
+        CVXOPT Formulation \\
+        `min F(x)` \\
+        `F(x) = 1/2 * (x.T * P * x) + (q.T * x)` \\
+        `Gx ≤ h` \\
+        `Ax = b`
+
+        Our problem is to `maximize` the `Ld(λ)` (lagrangian dual-problem), but the
+        library CVXOPT accepts a problem formulated as a `minimization` problem.
+        In order to obtain a MIN problem, we start from the dual and we multiply
+        by -1 the entire objective function `Ld(λ)`.
+
+        Lagrangian Dual Problem as Minimization Problem \\
+        `min -Ld(λ)` \\
+        `-F(λ) = 1/2 (λ • H • λ.T) - (∑ λi)`
+
+        CVXOPT Formulation Applied \\
+        `min -F(λ)` \\
+        `-F(λ) = 1/2 * (λ.T * (X * Y) * λ) - (I.T * λ)` \\
+        `∀i . -I λi ≤ 0` \\
+        `∀i .  I λi ≤ C` \\
+        `∑  . yi λi = 0`
+
+        CVXOPT Variables:
+         - P = (X * Y)
+         - q = -I.T
+         - G = -I :: I
+         - h = 0s :: C
+         - A = Y
+         - b = 0 (number)
+        """
+
+        ### number of Lagrangian multipliers parameters.
+        N = classes.shape[0]
+
+        # {cvxopt} Parameters Formulation
+        P = np.outer(classes, classes.T) * kernel
+        q = np.full(N, 1) * -1
+        G = np.vstack((np.identity(N) * -1, np.identity(N)))
+        h = np.hstack((np.full(N, 0), np.full(N, C)))
+        A = classes
+        b = .0
+
+        ### {cvxopt} matrix shape compatibility (for moltiplication).
+        A = A.reshape((1, N))
+        ###  {cvxopt} array types compatibility.
+        q = q.astype(np.double)
+        G = G.astype(np.double)
+        h = h.astype(np.double)
+
+        return (P, q, G, h, A, b)
+
+    def __cvxopt_matrix_conversion(self, P_form, q_form, G_form, h_form, A_form, b_form):
+        P = cvxopt.matrix(P_form.copy())
+        q = cvxopt.matrix(q_form.copy())
+        G = cvxopt.matrix(G_form.copy())
+        h = cvxopt.matrix(h_form.copy())
+        A = cvxopt.matrix(A_form.copy())
+        b = cvxopt.matrix(b_form)
+
+        return (P, q, G, h, A, b)
+
+    def __cvxopt_qp_solve(self, P, q, G, h, A, b):
+        return cvxopt.solvers.qp(P, q, G, h, A, b)
 
     #
 
     def initialize(self):
         cvxopt.solvers.options['show_progress'] = False
 
-    def cvxopt_solve(self, points, classes, kernel):
-        P, q, G, h, A, b = self.__cvxopt_formulation(points, classes, kernel)
+    def cvxopt_hard_margin_solve(self, classes, kernel):
+        P_form, q_form, G_form, h_form, A_form, b_form = self.__cvxopt_hard_formulation(
+            kernel, classes
+        )
+
+        P, q, G, h, A, b = self.__cvxopt_matrix_conversion(
+            P_form, q_form, G_form, h_form, A_form, b_form
+        )
+
+        solution = self.__cvxopt_qp_solve(P, q, G, h, A, b)
+
+        return solution
+
+    def cvxopt_soft_margin_solve(self, classes, kernel, C):
+        P_form, q_form, G_form, h_form, A_form, b_form = self.__cvxopt_soft_formulation(
+            kernel, classes, C
+        )
+
+        P, q, G, h, A, b = self.__cvxopt_matrix_conversion(
+            P_form, q_form, G_form, h_form, A_form, b_form
+        )
 
         return cvxopt.solvers.qp(P, q, G, h, A, b)
 
