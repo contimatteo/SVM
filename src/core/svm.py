@@ -7,9 +7,17 @@ from core.optimizer import Optimizer
 
 
 class SVM():
-    def __init__(self, C=None):
+    def __init__(self, kernel='linear', C=None):
+        if kernel == 'linear':
+            self._kernel_function = lambda M1, M2: Kernel.linear(M1, M2)
+        elif kernel == 'poly':
+            self._kernel_function = lambda M1, M2: Kernel.polynomial(M1, M2, exponent=3, alpha=1)
+        elif kernel == 'sigmoid':
+            self._kernel_function = lambda M1, M2: Kernel.sigmoid(M1, M2, b=0)
+        else:
+            raise Exception(f"SVM: invalid 'kernel={kernel}' parameter value.")
+
         self._kernel = None
-        self._kernel_function = Kernel.linear
 
         self._multipliers = None
         self._lambdas = None

@@ -27,8 +27,8 @@ np.random.seed(CONFIG.RANDOM_SEED)
 
 def main():
     # dataset = DatasetGenerator.random()
-    dataset = DatasetGenerator.linear()
-    # dataset = DatasetGenerator.non_linear1()
+    # dataset = DatasetGenerator.linear()
+    dataset = DatasetGenerator.non_linear1()
     # dataset = DatasetGenerator.non_linear2()
     # dataset = DatasetGenerator.non_linear3()
     # dataset = DatasetGenerator.non_linear4()
@@ -43,16 +43,18 @@ def main():
 
     ###
 
-    svm = SVM()
-    # svm = SVM(C=1.)
+    # svm = SVM(kernel='linear')
+    svm = SVM(kernel='linear', C=1.)
+    # svm = SVM(kernel='poly')
+    # svm = SVM(kernel='poly', C=1.)
+    # svm = SVM(kernel='sigmoid')
+    # svm = SVM(kernel='sigmoid', C=1.)
 
     svm.fit(X_train, Y_train)
 
     Y_train_predicted = svm.predict(X_train)
 
     Plotter.svm(X_train, Y_train_predicted, svm)
-
-    ###
 
 
 ###
