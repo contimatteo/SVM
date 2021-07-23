@@ -26,23 +26,25 @@ np.random.seed(CONFIG.RANDOM_SEED)
 
 
 def main():
-    # X, Y = DatasetGenerator.random()
-    # X, Y = DatasetGenerator.linear()
-    X, Y = DatasetGenerator.non_linear1()
-    # X, Y = DatasetGenerator.non_linear2()
-    # X, Y = DatasetGenerator.non_linear3()
-    # X, Y = DatasetGenerator.non_linear4()
+    # dataset = DatasetGenerator.random()
+    dataset = DatasetGenerator.linear()
+    # dataset = DatasetGenerator.non_linear1()
+    # dataset = DatasetGenerator.non_linear2()
+    # dataset = DatasetGenerator.non_linear3()
+    # dataset = DatasetGenerator.non_linear4()
+
+    ###
+
+    X, Y = dataset
 
     X_train, _, Y_train, _ = DatasetUtils.split(X, Y)
 
-    ###
-
-    Plotter.data(X_train, Y_train)
+    # Plotter.data(X_train, Y_train)
 
     ###
 
-    # svm = SVM()
-    svm = SVM(C=1.)
+    svm = SVM()
+    # svm = SVM(C=1.)
 
     svm.fit(X_train, Y_train)
 
