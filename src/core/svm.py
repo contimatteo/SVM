@@ -7,7 +7,7 @@ from core.optimizer import Optimizer
 
 
 class SVM():
-    def __init__(self, kernel='linear', C=None):
+    def __init__(self, kernel='linear', C=None, deg=None):
         self._kernel = None
         self._kernel_type = kernel
         self._kernel_function = None
@@ -21,11 +21,12 @@ class SVM():
         self._sv_idxs = None
 
         self.C = C
+        self.deg = deg if deg is not None else 6
 
         if self._kernel_type == 'linear':
             self._kernel_function = lambda x1, x2: Kernel.linear(x1, x2)
         elif self._kernel_type == 'poly':
-            self._kernel_function = lambda x1, x2: Kernel.polynomial(x1, x2, degree=5)
+            self._kernel_function = lambda x1, x2: Kernel.polynomial(x1, x2, degree=self.deg)
         else:
             raise Exception(f"SVM: invalid 'kernel={self._kernel_type}' parameter value.")
 

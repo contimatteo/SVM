@@ -57,38 +57,33 @@ class Plotter:
         plt.show()
 
     @staticmethod
-    def plot_decision_regions(X, y, Xtest, Ytest, classifier, kernel='<MISSING>', resolution=0.02):
-        # setup marker generator and color map
-        markers = ('s', 'x', 'o', '^', 'v')
-        colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
-        cmap = ListedColormap(colors[:len(np.unique(y))])
+    def regions(X, Y, classifier):
+        ### markers: 's', 'x', 'o', '^', 'v'
 
-        # plot the decision surface
-        x1_train_min, x1_train_max = X[:, 0].min() - 1, X[:, 0].max() + 1
-        x2_train_min, x2_train_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-        x1_test_min, x1_test_max = Xtest[:, 0].min() - 1, Xtest[:, 0].max() + 1
-        x2_test_min, x2_test_max = Xtest[:, 1].min() - 1, Xtest[:, 1].max() + 1
+        predefined_colors = ['red', 'blue', 'cyan']
+        classes_unique_values = np.unique(Y)
+        region_colormap = ListedColormap(predefined_colors[:classes_unique_values.shape[0]])
 
-        x1_min = min(x1_train_min, x1_test_min)
-        x1_max = max(x1_train_max, x1_test_max)
-        x2_min = min(x2_train_min, x2_test_min)
-        x2_max = max(x2_train_max, x2_test_max)
-        xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, resolution), np.arange(x2_min, x2_max, resolution))
-        Z = classifier.predict(np.array([xx1.ravel(), xx2.ravel()]).T)
-        Z = Z.reshape(xx1.shape)
-        plt.contourf(xx1, xx2, Z, alpha=0.4, cmap=cmap)
-        plt.xlim(xx1.min(), xx1.max())
-        plt.ylim(xx2.min(), xx2.max())
-        # plot class samples
-        for idx, cl in enumerate(np.unique(y)):
-            plt.scatter(x=X[y == cl, 0], y=X[y == cl, 1], alpha=0.8, c=cmap(idx),
-                        marker=markers[idx], label=cl)
-            plt.scatter(x=Xtest[Ytest == cl, 0], y=Xtest[Ytest == cl, 1], alpha=0.8, c=cmap(idx),
-                        marker=markers[3], label=cl)
+        x_max, y_max  = X[:, 0].max(), X[:, 1].max()
+        x_min, y_min  = X[:, 0].min(), X[:, 1].min()
+        x_min -= 2
+        y_min -= 2
+        x_max += 2
+        y_max += 2
+
+        x_margin_length = np.arange(x_min, x_max, .025)
+        y_margin_length =  np.arange(y_min, y_max, .025)
+        xx, yy = np.meshgrid(x_margin_length, y_margin_length)
+
+        generated_points_for_plotting = np.array([xx.flatten(), yy.flatten()]).T
+        classes = classifier.predict(generated_points_for_plotting).reshape(xx.shape)
+
+        plt.contourf(xx, yy, classes, alpha=0.4, cmap=region_colormap)
+        plt.xlim(xx.min(), xx.max())
+        plt.ylim(yy.min(), yy.max())
+
+        plt.scatter(X[Y == -1][:, 0], X[Y == -1][:, 1], color='black', s=25, marker='o')
+        plt.scatter(X[Y == 1][:, 0], X[Y == 1][:, 1], color='black', s=25, marker='x')
 
         plt.axis("tight")
-        if kernel == "linear":
-            plt.title("Linear Kernel")
-        elif kernel == "non_linear":
-            plt.title("Non Linear Kernel")
         plt.show()

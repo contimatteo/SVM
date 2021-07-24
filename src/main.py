@@ -33,9 +33,9 @@ def main():
     svm = None
 
     # dataset = DatasetGenerator.random()
-    dataset = DatasetGenerator.linear()
+    # dataset = DatasetGenerator.linear()
     # dataset = DatasetGenerator.non_linear1()
-    # dataset = DatasetGenerator.non_linear2()
+    dataset = DatasetGenerator.non_linear2()
     # dataset = DatasetGenerator.non_linear3()
     # dataset = DatasetGenerator.non_linear4()
 
@@ -74,8 +74,9 @@ def main():
 
     # svm = SVM(kernel='linear')
     # svm = SVM(kernel='linear', C=1.)
-    svm = SVM(kernel='poly')
+    # svm = SVM(kernel='poly')
     # svm = SVM(kernel='poly', C=1.)
+    svm = SVM(kernel='poly', C=1., deg=3)
 
     svm.fit(X_train, Y_train)
 
@@ -96,7 +97,7 @@ def main():
     ### Plot
 
     # Plotter.svm(X, Y, svm)
-    Plotter.plot_decision_regions(X, Y, X_test, Y_test, svm)
+    Plotter.regions(X, Y, svm)
 
 
 ###
