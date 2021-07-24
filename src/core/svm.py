@@ -15,7 +15,6 @@ class SVM():
         self._multipliers = None
         self._lambdas = None
         self._bias = None
-        self._w = None
 
         self._sv = None
         self._sv_Y = None
@@ -26,7 +25,7 @@ class SVM():
         if self._kernel_type == 'linear':
             self._kernel_function = lambda M1, M2: Kernel.linear(M1, M2)
         elif self._kernel_type == 'poly':
-            self._kernel_function = lambda M1, M2: Kernel.polynomial(M1, M2, exponent=3, alpha=1)
+            self._kernel_function = lambda M1, M2: Kernel.polynomial(M1, M2, exponent=5, alpha=1)
         elif self._kernel_type == 'sigmoid':
             self._kernel_function = lambda M1, M2: Kernel.sigmoid(M1, M2, b=0)
         else:
@@ -39,26 +38,14 @@ class SVM():
         return self._sv
 
     @property
-    def weights(self):
-        return self._w
-
-    @property
     def bias(self):
         return self._bias
 
     #
 
-    def project_to_hyperplane(self, points):
-        return SVMCore.hyperplane_projection_function(self._w, self._bias)(points)
-
-    def hyperplane_equation(self, x1, c=0):
-        return SVMCore.hyperplane_equation(self._w, self._bias)(x1, c)
-
-    #
-
     def fit(self, X, Y):
         ###  compute the kernel
-        self._kernel = SVMCore.compute_kernel(self._kernel_function, X)
+        self._kernel = SVMCore.apply_kernel(self._kernel_function, X)
 
         optimizer = Optimizer()
         optimizer.initialize()
@@ -71,9 +58,9 @@ class SVM():
             solution = optimizer.cvxopt_hard_margin_solve(Y, self._kernel)
 
         ###  lagrangian multipliers
-        self._multipliers = SVMCore.extract_multipliers(solution)
+        self._multipliers = SVMCore.multipliers(solution)
 
-        self._sv_idxs = SVMCore.extract_support_vectors_indexes(self._multipliers)
+        self._sv_idxs = SVMCore.support_vectors_indexes(self._multipliers)
 
         ###  lambda params (filtered multipliers)
         self._lambdas = self._multipliers[self._sv_idxs]
@@ -83,13 +70,17 @@ class SVM():
         self._sv_Y = Y[self._sv_idxs]
 
         ###  bias
-        self._bias = SVMCore.compute_bias(self._lambdas, self._kernel, self._sv_Y, self._sv_idxs)
+        self._bias = SVMCore.bias(self._lambdas, self._kernel, self._sv_Y, self._sv_idxs)
 
-        ### w (hyperplane equation coefficients)
-        self._w = SVMCore.compute_hyperplane_coefficients(self._lambdas, self._sv, self._sv_Y)
+    def project(self, points):
+        return SVMCore.hyperplane_projection(
+            self._kernel_type, self._kernel_function, self._lambdas, self._sv, self._sv_Y,
+            self._bias
+        )(points)
 
     def predict(self, X_test):
-        projections = self.project_to_hyperplane(X_test)
+        projections = self.project(X_test)
+
         return np.sign(projections)
 
 
@@ -98,11 +89,11 @@ class SVM():
 
 class SVMCore():
     @staticmethod
-    def compute_kernel(kernel_function, points):
+    def apply_kernel(kernel_function, points):
         return kernel_function(points, points.T)
 
     @staticmethod
-    def extract_multipliers(optimizer_solution):
+    def multipliers(optimizer_solution):
         """
         The solver returns the list of optimum variables values. \\
         In our case, variables are the lagrangian multipliers.
@@ -110,7 +101,7 @@ class SVMCore():
         return np.array(optimizer_solution['x']).flatten()
 
     @staticmethod
-    def extract_support_vectors_indexes(multipliers):
+    def support_vectors_indexes(multipliers):
         """
         In the solution, all points `xi` having the corresponding multiplier 
         `λi` strictly positive are named support vectors. All other points 
@@ -121,7 +112,7 @@ class SVMCore():
         return np.arange(multipliers.shape[0])[bool_idxs]
 
     @staticmethod
-    def compute_bias(lambdas, kernel, Y, sv_idxs):
+    def bias(lambdas, kernel, Y, sv_idxs):
         """
         TODO: missing explaination of the following computations
         """
@@ -133,14 +124,14 @@ class SVMCore():
         return bias
 
     @staticmethod
-    def compute_hyperplane_coefficients(lambdas, X, Y):
+    def __hyperplane_linear_coefficients(lambdas, sv, sv_Y):
         """
+        TODO: missing formulation ...
+
         given the hyperplane equation \\
         `f(x) = (w * x) + b`
 
-        and given the original Lagrangian formulation of our problem \\
-        `TODO: missing formulation ...` \\
-        `......`
+        and given the original Lagrangian formulation of our problem
 
         we obtain the following partial derivate of `L(w,b,λ)` (respect to `w`) \\
         `𝟃L/𝟃w = w - (λ * Y * X)`
@@ -151,19 +142,33 @@ class SVMCore():
         `w - (λ * Y * X) = 0` \\
         `w = λ * Y * X`
         """
+        X = sv
+        Y = sv_Y
         coefficients_to_sum = np.array(lambdas * Y * X.T)
         return np.sum(coefficients_to_sum, axis=1)
 
     @staticmethod
-    def hyperplane_projection_function(coefficients, bias):
+    def hyperplane_projection(kernel_type, kernel_function, lambdas, sv, sv_Y, bias):
         """
-        given the hyperplane equation \\
-        `f(x) = (w * X) + b`
+        TODO: missing formulation ...
         """
-        def project(points):
+        def linear_projection(points):
+            coefficients = SVMCore.__hyperplane_linear_coefficients(lambdas, sv, sv_Y)
             return np.dot(points, coefficients) + bias
 
-        return lambda X: project(X)
+        def non_linear_projection(points):
+            projections = np.zeros(points.shape[0])
+            for (idx1, point) in enumerate(points):
+                sign = 0
+                for idx2 in range(sv.shape[0]):
+                    sign += lambdas[idx2] * sv_Y[idx2] * kernel_function(point, sv[idx2])
+                projections[idx1] = sign + bias
+            return projections
+
+        if kernel_type == 'linear':
+            return lambda points: linear_projection(points)
+        else:
+            return lambda points: non_linear_projection(points)
 
     @staticmethod
     def hyperplane_equation(coefficients, bias):

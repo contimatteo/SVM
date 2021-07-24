@@ -33,8 +33,8 @@ def main():
     svm = None
 
     # dataset = DatasetGenerator.random()
-    # dataset = DatasetGenerator.linear()
-    dataset = DatasetGenerator.non_linear1()
+    dataset = DatasetGenerator.linear()
+    # dataset = DatasetGenerator.non_linear1()
     # dataset = DatasetGenerator.non_linear2()
     # dataset = DatasetGenerator.non_linear3()
     # dataset = DatasetGenerator.non_linear4()
@@ -74,7 +74,8 @@ def main():
 
     ### Plot
 
-    Plotter.svm(X, Y, svm)
+    # Plotter.svm(X, Y, svm)
+    Plotter.plot_decision_regions(X, Y, X_test, Y_test, svm)
 
 
 ###
