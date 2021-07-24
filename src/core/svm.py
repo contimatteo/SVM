@@ -23,11 +23,9 @@ class SVM():
         self.C = C
 
         if self._kernel_type == 'linear':
-            self._kernel_function = lambda M1, M2: Kernel.linear(M1, M2)
+            self._kernel_function = lambda x1, x2: Kernel.linear(x1, x2)
         elif self._kernel_type == 'poly':
-            self._kernel_function = lambda M1, M2: Kernel.polynomial(M1, M2, exponent=5, alpha=1)
-        elif self._kernel_type == 'sigmoid':
-            self._kernel_function = lambda M1, M2: Kernel.sigmoid(M1, M2, b=0)
+            self._kernel_function = lambda x1, x2: Kernel.polynomial(x1, x2, degree=5)
         else:
             raise Exception(f"SVM: invalid 'kernel={self._kernel_type}' parameter value.")
 

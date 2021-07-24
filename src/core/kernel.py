@@ -8,13 +8,23 @@ from numpy import linalg
 
 class Kernel:
     @staticmethod
-    def linear(M1, M2):
-        return np.dot(M1, M2)
+    def linear(x, y):
+        return np.dot(x, y)
 
     @staticmethod
-    def polynomial(M1, M2, exponent, alpha):
-        return (Kernel.linear(M1, M2) + alpha)**exponent
+    def polynomial(x, y, degree):
+        return (Kernel.linear(x, y) + 1)**degree
 
-    @staticmethod
-    def sigmoid(M1, M2, b):
-        return np.tanh(Kernel.linear(M1, M2) - b)
+    # TODO: remove this ...
+    # @staticmethod
+    # def rbf(x, y, gamma):
+    #     return np.exp(-gamma * linalg.norm((x-y), 2))
+
+    # TODO: remove this ...
+    # @staticmethod
+    # def sigmoid(x, y, b):
+    #     return np.tanh(Kernel.linear(x, y) + b)
+
+    # TODO: remove this ...
+    # def gaussian(x, y, sigma=5.0):
+    #     return np.exp(-linalg.norm(x-y)**2 / (2 * (sigma ** 2)))

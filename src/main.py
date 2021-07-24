@@ -39,6 +39,29 @@ def main():
     # dataset = DatasetGenerator.non_linear3()
     # dataset = DatasetGenerator.non_linear4()
 
+    # use_cases = [
+    #     {
+    #         'dataset': DatasetGenerator.linear(),
+    #         'kernels': ['linear', 'poly']
+    #     },
+    #     {
+    #         'dataset': DatasetGenerator.non_linear1(),
+    #         'kernels': ['linear', 'poly']
+    #     },
+    #     {
+    #         'dataset': DatasetGenerator.non_linear2(),
+    #         'kernels': ['poly', 'gaussian']
+    #     },
+    #     {
+    #         'dataset': DatasetGenerator.non_linear3(),
+    #         'kernels': ['poly', 'gaussian']
+    #     },
+    #     {
+    #         'dataset': DatasetGenerator.random(),
+    #         'kernels': ['linear', 'poly', 'gaussian']
+    #     },
+    # ]
+
     ### Dataset
 
     X, Y = dataset
@@ -53,8 +76,6 @@ def main():
     # svm = SVM(kernel='linear', C=1.)
     svm = SVM(kernel='poly')
     # svm = SVM(kernel='poly', C=1.)
-    # svm = SVM(kernel='sigmoid')
-    # svm = SVM(kernel='sigmoid', C=1.)
 
     svm.fit(X_train, Y_train)
 
