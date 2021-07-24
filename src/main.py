@@ -30,6 +30,8 @@ def __accuracy(Y, Y_predicted):
 
 
 def main():
+    svm = None
+
     # dataset = DatasetGenerator.random()
     # dataset = DatasetGenerator.linear()
     dataset = DatasetGenerator.non_linear1()
@@ -47,9 +49,9 @@ def main():
 
     ### Training
 
-    svm = SVM(kernel='linear')
+    # svm = SVM(kernel='linear')
     # svm = SVM(kernel='linear', C=1.)
-    # svm = SVM(kernel='poly')
+    svm = SVM(kernel='poly')
     # svm = SVM(kernel='poly', C=1.)
     # svm = SVM(kernel='sigmoid')
     # svm = SVM(kernel='sigmoid', C=1.)

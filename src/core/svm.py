@@ -8,16 +8,9 @@ from core.optimizer import Optimizer
 
 class SVM():
     def __init__(self, kernel='linear', C=None):
-        if kernel == 'linear':
-            self._kernel_function = lambda M1, M2: Kernel.linear(M1, M2)
-        elif kernel == 'poly':
-            self._kernel_function = lambda M1, M2: Kernel.polynomial(M1, M2, exponent=3, alpha=1)
-        elif kernel == 'sigmoid':
-            self._kernel_function = lambda M1, M2: Kernel.sigmoid(M1, M2, b=0)
-        else:
-            raise Exception(f"SVM: invalid 'kernel={kernel}' parameter value.")
-
         self._kernel = None
+        self._kernel_type = kernel
+        self._kernel_function = None
 
         self._multipliers = None
         self._lambdas = None
@@ -29,6 +22,15 @@ class SVM():
         self._sv_idxs = None
 
         self.C = C
+
+        if self._kernel_type == 'linear':
+            self._kernel_function = lambda M1, M2: Kernel.linear(M1, M2)
+        elif self._kernel_type == 'poly':
+            self._kernel_function = lambda M1, M2: Kernel.polynomial(M1, M2, exponent=3, alpha=1)
+        elif self._kernel_type == 'sigmoid':
+            self._kernel_function = lambda M1, M2: Kernel.sigmoid(M1, M2, b=0)
+        else:
+            raise Exception(f"SVM: invalid 'kernel={self._kernel_type}' parameter value.")
 
     #
 
@@ -158,10 +160,10 @@ class SVMCore():
         given the hyperplane equation \\
         `f(x) = (w * X) + b`
         """
-        def project_to_hyperplane(coefficients, bias, points):
+        def project(points):
             return np.dot(points, coefficients) + bias
 
-        return lambda X: project_to_hyperplane(coefficients, bias, X)
+        return lambda X: project(X)
 
     @staticmethod
     def hyperplane_equation(coefficients, bias):
