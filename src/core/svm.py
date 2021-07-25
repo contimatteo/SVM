@@ -21,7 +21,7 @@ class SVM():
         self._sv_idxs = None
 
         self.C = C
-        self.deg = deg if deg is not None else 6
+        self.deg = deg if deg is not None else 3
 
         if self._kernel_type == 'linear':
             self._kernel_function = lambda x1, x2: Kernel.linear(x1, x2)
@@ -35,6 +35,10 @@ class SVM():
     @property
     def support_vectors(self):
         return self._sv
+
+    @property
+    def support_vectors_Y(self):
+        return self._sv_Y
 
     @property
     def bias(self):
@@ -168,17 +172,3 @@ class SVMCore():
             return lambda points: linear_projection(points)
         else:
             return lambda points: non_linear_projection(points)
-
-    @staticmethod
-    def hyperplane_equation(coefficients, bias):
-        """
-        given the hyperplane equation (where the default value of `c` is 0) \\
-        `w1 * x1 + w2 * x2 + b = c`
-
-        we obtain 
-        `x2 = (-w1 * x1 - b + c) / w2`
-        """
-        def equation(w, b, x1, c):
-            return (-w[0] * x1 - b + c) / w[1]
-
-        return lambda x1, c: equation(coefficients, bias, x1, c)
