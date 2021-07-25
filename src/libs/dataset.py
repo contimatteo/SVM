@@ -29,11 +29,7 @@ class DatasetGenerator:
         N_POINTS_TOT = 100
         N_POINTS_FOR_CLASS = int(N_POINTS_TOT / 2)
 
-        # TODO: improve this value
-        mean1 = np.array([0, 2])
-        # TODO: improve this value
-        mean2 = np.array([2, 0])
-        # TODO: improve this value
+        mean1, mean2 = np.array([0, 2]), np.array([2, 0])
         cov = np.array([[0.8, 0.6], [0.6, 0.8]])
 
         X_class1 = np.random.multivariate_normal(mean1, cov, N_POINTS_FOR_CLASS)
