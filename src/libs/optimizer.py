@@ -15,7 +15,6 @@ class Optimizer():
 
         Primal Lagrangian Formulation \\
         `min Lp(w,b)` \\
-        `max Ld(λ)` \\
         `L(w, b, λ) = (1/2 ||W||^2) - (∑ λi yi (xi • W + b)) + (∑ λi)`
 
         Bordered Hessian \\
@@ -87,7 +86,6 @@ class Optimizer():
 
         Primal Lagrangian Formulation \\
         `min Lp(w,b)` \\
-        `max Ld(λ)` \\
         `L(w, b, λ) = (1/2 ||W||^2) + (C ∑ ξi) - (∑ λi yi (xi • W + b) - 1 + ξi) - (∑ μi ξi)`
 
         Bordered Hessian \\

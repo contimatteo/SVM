@@ -117,7 +117,42 @@ class SVMCore():
     @staticmethod
     def bias(lambdas, kernel, Y, sv_idxs):
         """
-        TODO: missing explaination of the following computations
+        given the primal Lagrangian Formulation:
+        `min Lp(w,b)` \\
+        `L(w, b, λ) = (1/2 ||W||^2) - (∑ λi yi (xi • W + b)) + (∑ λi)`
+
+        we obtain the following partial derivate of `L(W,b,λ)` (respect to `W`) \\
+        `𝟃L/𝟃w = W - (∑ λi yi xi)`
+        and the following partial derivate of `L(W,b,λ)` (respect to `b`): \\
+        `𝟃L/𝟃b = 0` \\
+        `∑ λi yi = 0`
+
+        and then by applying the KKT (1) condition (used to have guarantees on the
+        optimality of the result) from the first partial derivate `𝟃L/𝟃w` we get \\
+        `𝟃L/𝟃W = 0` \\
+        `W - (λ Y X) = 0` \\
+        `W = λ Y X`
+
+        now, we have that any point which:
+         1. satisfies the above `∑ λi yi = 0` condition 
+         2. is a Support Vector `xs`
+        
+        will have the form: \\
+        `ys (xs • W + b) = 1`
+
+        also we can obtain the set `S` of Support Vectors by
+        taking all the  indexes `i` for which `λi > 0`.
+
+        finally, given the set `S`, we can replace `W` with 
+        the above equality (where `m € S`): \\
+        `ys (∑ λm ym xm • xs + b) = 1`
+
+        multiplying the above equation by `ys`, using `y^2 = 1`
+        and using the original problem constraint (where `m € S`): \\
+        `∀i . yi (xi • W + b) -1 ≥ 0` \\
+        we obtain: \\
+        `ys^2 (∑ λm ym xm • xs + b) = ys` \\
+        `b = ys - (∑ λm ym xm • xs)`
         """
         bias = 0
         for n in range(lambdas.shape[0]):
@@ -132,18 +167,30 @@ class SVMCore():
         TODO: missing formulation ...
 
         given the hyperplane equation \\
-        `f(x) = (w * x) + b`
+        `f(x) = (W • x) + b`
 
-        and given the original Lagrangian formulation of our problem
+        and given the primal Lagrangian formulation of our problem, we 
+        obtain the following partial derivate of `L(W,b,λ)` (respect to `W`) \\
+        `𝟃L/𝟃w = W - (∑ λi yi xi)`
 
-        we obtain the following partial derivate of `L(w,b,λ)` (respect to `w`) \\
-        `𝟃L/𝟃w = w - (λ * Y * X)`
+        and then by applying the KKT (1) condition (used to have guarantees on 
+        the optimality of the result) we get \\
+        `𝟃L/𝟃W = 0` \\
+        `W - (λ Y X) = 0` \\
+        `W = λ Y X`
 
-        and then by applying the KKT (1) condition (used to have
-        guarantees on the optimality of the result) we get \\
-        `𝟃L/𝟃w = 0` \\
-        `w - (λ * Y * X) = 0` \\
-        `w = λ * Y * X`
+        we can also compute the partial derivate of `L(W,b,λ)` (respect to `W`): \\
+        `𝟃L/𝟃W = 0` \\
+        `∑ λi yi = 0`
+
+        now we have thatany point satisfying the above `∑ λi yi = 0` condition 
+        which is a Support Vector `xs` will have the form: \\
+        `ys (xs • W + b) = 1`
+
+        given the set `S` composed by all the Support Vectors,
+        we can replace `W` with the above equality (`m € S`): \\
+        `ys (∑ λm ym xm • xs + b) = 1` \\
+
         """
         X = sv
         Y = sv_Y
