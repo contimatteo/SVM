@@ -53,26 +53,26 @@ class SVM():
         optimizer = Optimizer()
         optimizer.initialize()
 
-        ###  QP problem solution
+        ### QP problem solution
         solution = None
         if self.C is not None:
             solution = optimizer.cvxopt_soft_margin_solve(Y, self._kernel, self.C)
         else:
             solution = optimizer.cvxopt_hard_margin_solve(Y, self._kernel)
 
-        ###  lagrangian multipliers
+        ### lagrangian multipliers
         self._multipliers = SVMCore.multipliers(solution)
 
         self._sv_idxs = SVMCore.support_vectors_indexes(self._multipliers)
 
-        ###  lambda params (filtered multipliers)
+        ### lambda params (filtered multipliers)
         self._lambdas = self._multipliers[self._sv_idxs]
 
-        ###  support vectors
+        ### support vectors
         self._sv = X[self._sv_idxs]
         self._sv_Y = Y[self._sv_idxs]
 
-        ###  bias
+        ### bias
         self._bias = SVMCore.bias(self._lambdas, self._kernel, self._sv_Y, self._sv_idxs)
 
     def project(self, points):
