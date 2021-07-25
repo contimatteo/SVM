@@ -7,37 +7,44 @@ import numpy as np
 class Optimizer():
     def __cvxopt_hard_formulation(self, kernel, classes):
         """
-        TODO: re-write the formulation below ...
+        Objective Function \\
+        `min (1/2 ||W||^2)`
 
-        Lagrangian Formulation \\
-        `min L(w,b)` \\
-        `max L(λ)` \\
-        `L(w, b, λ) = 1/2 * ||w||^2 + ∑ λi * (yi * (w * xi + b) - 1)`
+        Constraints \\
+        `∀i . yi (xi • W + b) -1 ≥ 0`
 
-        Dual of Lagrangian Formulation \\
-        `max F(λ)` \\
-        `F(λ) = ∑ λi - 1/2 * (∑ ∑ λi * λj * yi * yj * xi * xj)`
-        
+        Primal Lagrangian Formulation \\
+        `min Lp(w,b)` \\
+        `max Ld(λ)` \\
+        `L(w, b, λ) = (1/2 ||W||^2) - (∑ λi yi (xi • W + b)) + (∑ λi)`
+
+        Bordered Hessian \\
+        `H = (Y Y.T X.T) • X`
+
+        Dual Lagrangian Formulation \\
+        `max Ld(λ)` \\
+        `F(λ) = ∑ λi - 1/2 (λ.T H λ)`
+
         CVXOPT Formulation \\
         `min F(x)` \\
-        `F(x) = 1/2 * (x.T * P * x) + (q.T * x)` \\
+        `F(x) = 1/2 (x.T P x) + (q.T x)` \\
         `Gx ≤ h` \\
         `Ax = b`
 
-        Our problem is to `maximize` the `F(λ)` (lagrangian dual-problem), but the
+        Our problem is to `maximize` the `Ld(λ)` (lagrangian dual-problem), but the
         library CVXOPT accepts a problem formulated as a `minimization` problem.
-        In order to obtain a MIN problem, we start from the dual and we multiply
-        by -1 the entire objective function `F(λ)`.
+        In order to obtain a MIN problem, we start from the MAX dual and we multiply
+        by -1 the entire objective function `Ld(λ)`.
 
         Lagrangian Dual Problem as Minimization Problem \\
-        `min -F(λ)` \\
-        `-F(λ) = 1/2 * (∑ ∑ λi * λj * yi * yj * xi * xj) - ∑ λi`
+        `min -Ld(λ)` \\
+        `-F(λ) = 1/2 (λ H λ.T) - (∑ λi)`
 
         CVXOPT Formulation Applied \\
         `min -F(λ)` \\
-        `-F(λ) = 1/2 * (λ.T * (X * Y) * λ) - (I.T * λ)` \\
-        `(-1 * I * λi) ≤ 0` \\
-        `∑ λi * yi = 0`
+        `-F(λ) = 1/2 * (λ.T (X • Y) λ) - (I.T λ)` \\
+        `∀i . -I λi ≤ 0` \\
+        `∑  . yi λi = 0`
 
         CVXOPT Variables:
          - P = (X * Y)
@@ -88,26 +95,26 @@ class Optimizer():
 
         Dual Lagrangian Formulation \\
         `max Ld(λ)` \\
-        `F(λ) = ∑ λi - 1/2 (λ • H • λ.T)`
+        `F(λ) = ∑ λi - 1/2 (λ H λ.T)`
         
         CVXOPT Formulation \\
         `min F(x)` \\
-        `F(x) = 1/2 * (x.T * P * x) + (q.T * x)` \\
+        `F(x) = 1/2 (x.T P x) + (q.T x)` \\
         `Gx ≤ h` \\
         `Ax = b`
 
         Our problem is to `maximize` the `Ld(λ)` (lagrangian dual-problem), but the
         library CVXOPT accepts a problem formulated as a `minimization` problem.
-        In order to obtain a MIN problem, we start from the dual and we multiply
+        In order to obtain a MIN problem, we start from the MAX dual and we multiply
         by -1 the entire objective function `Ld(λ)`.
 
         Lagrangian Dual Problem as Minimization Problem \\
         `min -Ld(λ)` \\
-        `-F(λ) = 1/2 (λ • H • λ.T) - (∑ λi)`
+        `-F(λ) = 1/2 (λ H λ.T) - (∑ λi)`
 
         CVXOPT Formulation Applied \\
         `min -F(λ)` \\
-        `-F(λ) = 1/2 * (λ.T * (X * Y) * λ) - (I.T * λ)` \\
+        `-F(λ) = 1/2 (λ.T (X • Y) λ) - (I.T λ)` \\
         `∀i . -I λi ≤ 0` \\
         `∀i .  I λi ≤ C` \\
         `∑  . yi λi = 0`
