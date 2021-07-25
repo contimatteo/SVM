@@ -149,12 +149,28 @@ class SVMCore():
         the above equality (where `m € S`): \\
         `ys (∑ λm ym xm • xs + b) = 1`
 
+        using an arbitrary Support Vector `xs`, then \\
         multiplying the above equation by `ys`, using `y^2 = 1`
         and using the original problem constraint (where `m € S`): \\
         `∀i . yi (xi • W + b) -1 ≥ 0` \\
         we obtain: \\
         `ys^2 (∑ λm ym xm • xs + b) = ys` \\
         `b = ys - (∑ λm ym xm • xs)`
+
+        instead of using an arbitrary Support Vector `xs`, it is better 
+        to take an average over all of the Support Vectors in `S`.
+        
+        the final formula is (where `m € S`): \\
+        `b =  1/|S|  (∑ ys - (∑ λm ym xm • xs))`
+
+        NON-LINEAR CASE: \\
+
+        hyperplane coefficients `W` formulation slightly change:
+        `W - (∑ λi yi kernel(xi)) = 0` \\
+        `W = (∑ λi yi kernel(xi))`
+
+        and, as a consequence, also `b` formulation change:
+        `b =  1/|S|  (∑ ys - (∑ λm ym kernel(xm) • kernel(xs)))`
         """
         bias = 0
         for n in range(lambdas.shape[0]):
@@ -166,6 +182,8 @@ class SVMCore():
     @staticmethod
     def __hyperplane_linear_coefficients(lambdas, sv, sv_Y):
         """
+        LINEAR CASE (only) \\
+
         given the hyperplane equation \\
         `f(x) = (W • x) + b`
 
@@ -187,7 +205,26 @@ class SVMCore():
     @staticmethod
     def hyperplane_projection(kernel_type, kernel_function, lambdas, sv, sv_Y, bias):
         """
-        TODO: missing formulation ...
+        LINEAR CASE
+        
+        given the hyperplane coefficients `W` and a point `x'` we compute: \\
+        `f(x') = W • x' + b`
+
+        NON-LINEAR CASE \\
+
+        (NB. hyperplane bias `b` formulation depends on hyperplane `W` formulation).
+
+        in this case the hyperplane coefficients `W` formulation directly depend on the `kernel(x')`
+        value (where `x'` are input points and `kernel` is the kernel function to apply). \\
+
+        This because we have: \\
+        `W = (∑ λi yi kernel(xi))` \\
+        and for evaluating a point `x'` we need to compute: \\
+        `x'_proj = W • kernel(x') + b ` \\
+        which results in:
+        `x'_proj = ∑ λi yi kernel(xi, x') + b `
+        
+        As a consequence, we cannot compute `W` a-priori.
         """
         def linear_projection(points):
             coefficients = SVMCore.__hyperplane_linear_coefficients(lambdas, sv, sv_Y)
