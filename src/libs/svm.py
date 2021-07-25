@@ -75,6 +75,8 @@ class SVM():
         ### bias
         self._bias = SVMCore.bias(self._lambdas, self._kernel, self._sv_Y, self._sv_idxs)
 
+        ### +FEATURE: hyperplane coefficients can be pre-computed (only) in the 'linear' case.
+
     def project(self, points):
         return SVMCore.hyperplane_projection(
             self._kernel_type, self._kernel_function, self._lambdas, self._sv, self._sv_Y,
@@ -130,7 +132,7 @@ class SVMCore():
         and then by applying the KKT (1) condition (used to have guarantees on the
         optimality of the result) from the first partial derivate `𝟃L/𝟃w` we get \\
         `𝟃L/𝟃W = 0` \\
-        `W - (λ Y X) = 0` \\
+        `W - (∑ λi yi xi) = 0` \\
         `W = λ Y X`
 
         now, we have that any point which:
@@ -164,8 +166,6 @@ class SVMCore():
     @staticmethod
     def __hyperplane_linear_coefficients(lambdas, sv, sv_Y):
         """
-        TODO: missing formulation ...
-
         given the hyperplane equation \\
         `f(x) = (W • x) + b`
 
@@ -176,21 +176,8 @@ class SVMCore():
         and then by applying the KKT (1) condition (used to have guarantees on 
         the optimality of the result) we get \\
         `𝟃L/𝟃W = 0` \\
-        `W - (λ Y X) = 0` \\
+        `W - (∑ λi yi xi) = 0` \\
         `W = λ Y X`
-
-        we can also compute the partial derivate of `L(W,b,λ)` (respect to `W`): \\
-        `𝟃L/𝟃W = 0` \\
-        `∑ λi yi = 0`
-
-        now we have thatany point satisfying the above `∑ λi yi = 0` condition 
-        which is a Support Vector `xs` will have the form: \\
-        `ys (xs • W + b) = 1`
-
-        given the set `S` composed by all the Support Vectors,
-        we can replace `W` with the above equality (`m € S`): \\
-        `ys (∑ λm ym xm • xs + b) = 1` \\
-
         """
         X = sv
         Y = sv_Y
