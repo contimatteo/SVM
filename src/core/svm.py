@@ -55,7 +55,7 @@ class SVM():
 
         ###  QP problem solution
         solution = None
-        if self.C:
+        if self.C is not None:
             solution = optimizer.cvxopt_soft_margin_solve(Y, self._kernel, self.C)
         else:
             solution = optimizer.cvxopt_hard_margin_solve(Y, self._kernel)

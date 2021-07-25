@@ -93,11 +93,10 @@ class Plotter:
         plt.show()
 
     @staticmethod
-    def advanced(X_train, Y_train, X_test, Y_test, svm: SVM):
+    def advanced(fig, axs, X_train, Y_train, X_test, Y_test, svm: SVM):
         X = np.concatenate((X_train, X_test))
         Y = np.concatenate((Y_train, Y_test))
 
-        ax = plt.gca()
         cmap = Plotter.__color_map(Y)
 
         x_min, x_max = X[:, 0].min(), X[:, 0].max()
@@ -113,7 +112,7 @@ class Plotter:
         xy = np.vstack([xx.ravel(), yy.ravel()]).T
         projections = svm.project(xy).reshape(xx.shape)
 
-        ax.contour(
+        axs.contour(
             xx,
             yy,
             projections,
@@ -123,21 +122,34 @@ class Plotter:
             linestyles=['--', '-', '--']
         )
 
-        # plt.scatter(X[:, 0], X[:, 1], c=Y, s=15, marker='o', cmap=cmap)
-        plt.scatter(X_train[:, 0], X_train[:, 1], c=Y_train, s=25, marker='o', cmap=cmap)
-        plt.scatter(X_test[:, 0], X_test[:, 1], c=Y_test, s=25, marker='x', cmap=cmap)
+        # axs.scatter(X[:, 0], X[:, 1], c=Y, s=15, marker='o', cmap=cmap)
+        axs.scatter(X_train[:, 0], X_train[:, 1], c=Y_train, s=20, marker='o', cmap=cmap)
+        axs.scatter(X_test[:, 0], X_test[:, 1], c=Y_test, s=20, marker='x', cmap=cmap)
 
-        ax.scatter(
+        axs.scatter(
             svm.support_vectors[:, 0],
             svm.support_vectors[:, 1],
-            s=150,
+            s=130,
             edgecolors='k',
             linewidths=1,
             facecolors='none'
         )
 
-        ax.set_xlim((x_min, x_max))
-        ax.set_ylim((y_min, y_max))
+        axs.set_xlim((x_min, x_max))
+        axs.set_ylim((y_min, y_max))
 
-        plt.axis("tight")
-        plt.show()
+    @staticmethod
+    def data(fig, axs, X, Y):
+        cmap = Plotter.__color_map(Y)
+
+        x_min, x_max = X[:, 0].min(), X[:, 0].max()
+        y_min, y_max = X[:, 1].min(), X[:, 1].max()
+        x_min -= 1  # (x_min / 5)
+        y_min -= 1  # (y_min / 5)
+        x_max += 1  # (x_max / 5)
+        y_max += 1  # (y_max / 5)
+
+        axs.scatter(X[:, 0], X[:, 1], c=Y, s=15, marker='o', cmap=cmap)
+
+        axs.set_xlim((x_min, x_max))
+        axs.set_ylim((y_min, y_max))
