@@ -4,33 +4,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from libs.svm import SVM
-from libs.dataset import DatasetGenerator, DatasetUtils
+from dataset.utils import DatasetLoader, DatasetUtils
 from libs.plot import Plotter
 
 ###
 
 warnings.filterwarnings("ignore")
-
 np.random.seed(666)
 
-###
-
-###
-### TODO: MISSING TASKS
-###
-### [ ] re-write all problem equation/formulas in the comments
-### [ ] export the dataset used
-###
-
-###
-
 datasets = [
-    DatasetGenerator.linear(),
-    DatasetGenerator.non_linear1(),
-    DatasetGenerator.non_linear2(),
-    DatasetGenerator.non_linear3(),
-    DatasetGenerator.non_linear4(),
-    DatasetGenerator.random()
+    DatasetLoader.linear(),
+    DatasetLoader.non_linear1(),
+    DatasetLoader.non_linear2(),
+    DatasetLoader.non_linear3(),
+    DatasetLoader.non_linear4(),
+    DatasetLoader.random()
 ]
 
 ###
@@ -77,15 +65,16 @@ def __analyze_svm(fig, axs, config, dataset):
 
 def main(dataset_index=None):
     if dataset_index is None:
-        dataset_index = 1 
+        dataset_index = 1
 
     dataset = datasets[dataset_index]
-    
+
     fig, axs = plt.subplots(2, 2)
 
     ### Linear (hard)
 
     title = 'Linear (hard)'
+    axs[0, 0].set_title(title)
 
     __analyze_svm(
         fig, axs[0, 0], {
@@ -96,11 +85,10 @@ def main(dataset_index=None):
         }, dataset
     )
 
-    axs[0, 0].set_title(title)
-
     ### Linear (soft)
 
     title = 'Linear (soft, C=.5)'
+    axs[0, 1].set_title(title)
 
     __analyze_svm(
         fig, axs[0, 1], {
@@ -111,23 +99,19 @@ def main(dataset_index=None):
         }, dataset
     )
 
-    axs[0, 1].set_title(title)
-
     ### Poly (soft)
 
     title = 'Poly-3 (soft, C=.5)'
+    axs[1, 0].set_title(title)
 
     __analyze_svm(fig, axs[1, 0], {'title': title, 'kernel': 'poly', 'C': .5, 'deg': 3}, dataset)
-
-    axs[1, 0].set_title(title)
 
     ### Poly (soft)
 
     title = 'Poly-5 (hard)'
+    axs[1, 1].set_title(title)
 
     __analyze_svm(fig, axs[1, 1], {'title': title, 'kernel': 'poly', 'C': None, 'deg': 5}, dataset)
-
-    axs[1, 1].set_title(title)
 
     ###
 

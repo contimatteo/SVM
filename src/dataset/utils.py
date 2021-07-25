@@ -110,3 +110,45 @@ class DatasetGenerator:
         Y = np.array([random.choice([-1, 1]) for i in range(N_POINTS_TOT)]).astype(np.double)
 
         return DatasetUtils.shuffle(X, Y)
+
+
+###
+
+class DatasetLoader:
+    @staticmethod
+    def __load_txt(uri):
+        XY = np.loadtxt(uri, delimiter=',')
+        X = XY[:, :-1].astype(np.double)
+        Y = XY[:, -1].astype(np.double)
+        return X, Y
+    
+    @staticmethod
+    def linear():
+        X, Y = DatasetLoader.__load_txt('dataset/linear.txt')
+        return DatasetUtils.shuffle(X, Y)
+
+    @staticmethod
+    def non_linear1():
+        X, Y = DatasetLoader.__load_txt('dataset/non_linear1.txt')
+        return DatasetUtils.shuffle(X, Y)
+
+    @staticmethod
+    def non_linear2():
+        X, Y = DatasetLoader.__load_txt('dataset/non_linear2.txt')
+        return DatasetUtils.shuffle(X, Y)
+
+    @staticmethod
+    def non_linear3():
+        X, Y = DatasetLoader.__load_txt('dataset/non_linear3.txt')
+        return DatasetUtils.shuffle(X, Y)
+
+    @staticmethod
+    def non_linear4():
+        X, Y = DatasetLoader.__load_txt('dataset/non_linear4.txt')
+        return DatasetUtils.shuffle(X, Y)
+
+
+    @staticmethod
+    def random():
+        X, Y = DatasetLoader.__load_txt('dataset/random.txt')
+        return DatasetUtils.shuffle(X, Y)
