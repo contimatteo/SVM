@@ -1,7 +1,7 @@
 import numpy as np
 
-from core.kernel import Kernel
-from core.optimizer import Optimizer
+from libs.kernel import Kernel
+from libs.optimizer import Optimizer
 
 ###
 

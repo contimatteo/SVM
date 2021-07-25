@@ -3,7 +3,7 @@ import numpy as np
 
 from matplotlib.colors import ListedColormap
 
-from core.svm import SVM
+from libs.svm import SVM
 
 ###
 

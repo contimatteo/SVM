@@ -3,9 +3,9 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 
-from core.svm import SVM
-from utils.dataset import DatasetGenerator, DatasetUtils
-from utils.plot import Plotter
+from libs.svm import SVM
+from libs.dataset import DatasetGenerator, DatasetUtils
+from libs.plot import Plotter
 
 ###
 
