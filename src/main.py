@@ -6,6 +6,8 @@ from core.svm import SVM
 from utils.dataset import DatasetGenerator, DatasetUtils
 from utils.plot import Plotter
 
+from sklearn.svm import SVC  # "Support vector classifier"
+
 ###
 
 np.random.seed(CONFIG.RANDOM_SEED)
@@ -35,9 +37,9 @@ def main():
     # dataset = DatasetGenerator.random()
     # dataset = DatasetGenerator.linear()
     # dataset = DatasetGenerator.non_linear1()
-    dataset = DatasetGenerator.non_linear2()
+    # dataset = DatasetGenerator.non_linear2()
     # dataset = DatasetGenerator.non_linear3()
-    # dataset = DatasetGenerator.non_linear4()
+    dataset = DatasetGenerator.non_linear4()
 
     # use_cases = [
     #     {
@@ -58,7 +60,7 @@ def main():
     #     },
     #     {
     #         'dataset': DatasetGenerator.random(),
-    #         'kernels': ['linear', 'poly', 'gaussian']
+    #         'kernel': 'linear',
     #     },
     # ]
 
@@ -68,15 +70,14 @@ def main():
 
     X_train, X_test, Y_train, Y_test = DatasetUtils.split(X, Y)
 
-    # Plotter.data(X_train, Y_train)
-
     ### Training
 
     # svm = SVM(kernel='linear')
-    # svm = SVM(kernel='linear', C=1.)
+    # svm = SVM(kernel='linear', C=10)
     # svm = SVM(kernel='poly')
-    # svm = SVM(kernel='poly', C=1.)
-    svm = SVM(kernel='poly', C=1., deg=3)
+    svm = SVM(kernel='poly', deg=3, C=.1)
+    # svm = SVM(kernel='poly', deg=3, C=10)
+    # svm = SVM(kernel='poly', deg=5, C=.1)
 
     svm.fit(X_train, Y_train)
 
@@ -84,20 +85,23 @@ def main():
 
     train_accuracy = __accuracy(Y_train, Y_train_predicted)
 
-    print(" $ [INFO] training-set accuracy = {:.2%}".format(train_accuracy))
-
     ### Testing
 
     Y_test_predicted = svm.predict(X_test)
 
     test_accuracy = __accuracy(Y_test, Y_test_predicted)
 
-    print(" $ [INFO] testing-set accuracy = {:.2%}".format(test_accuracy))
+    ### Stats
+
+    print()
+    print(" $ [INFO] CORRECT PREDICTIONS (%)")
+    print(" $ [INFO] training-set  =  {:.2%}".format(train_accuracy))
+    print(" $ [INFO]  testing-set  =  {:.2%}".format(test_accuracy))
+    print()
 
     ### Plot
 
-    # Plotter.svm(X, Y, svm)
-    Plotter.regions(X, Y, svm)
+    Plotter.advanced(X_train, Y_train, X_test, Y_test, svm)
 
 
 ###

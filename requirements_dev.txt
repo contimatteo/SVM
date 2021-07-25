@@ -7,7 +7,6 @@ cvxopt
 matplotlib
 numpy
 scikit-learn
-seaborn
 
 pylint
 yapf
