@@ -144,8 +144,8 @@ if __name__ == "__main__":
         "--dataset",
         help="dataset index to use.",
         choices=['1', '2', '3', '4', '5', '6'],
-        default=1,
-        required=False
+        # default=1,
+        required=True
     )
 
     args = parser.parse_args()
