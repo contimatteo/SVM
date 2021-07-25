@@ -75,10 +75,12 @@ def __analyze_svm(fig, axs, config, dataset):
     Plotter.advanced(fig, axs, X_train, Y_train, X_test, Y_test, svm)
 
 
-def main(dataset_index):
+def main(dataset_index=None):
+    if dataset_index is None:
+        dataset_index = 1 
 
     dataset = datasets[dataset_index]
-
+    
     fig, axs = plt.subplots(2, 2)
 
     ### Linear (hard)

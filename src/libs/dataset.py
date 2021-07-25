@@ -26,7 +26,7 @@ class DatasetUtils:
 class DatasetGenerator:
     @staticmethod
     def linear():
-        N_POINTS_TOT = 200
+        N_POINTS_TOT = 100
         N_POINTS_FOR_CLASS = int(N_POINTS_TOT / 2)
 
         # TODO: improve this value
@@ -49,50 +49,66 @@ class DatasetGenerator:
 
     @staticmethod
     def non_linear1():
-        # generate training data in the 2-d case
-        mean1 = np.array([0, 2])
-        mean2 = np.array([2, 0])
+        N_POINTS_TOT = 100
+        N_POINTS_FOR_CLASS = int(N_POINTS_TOT / 2)
+
+        mean1, mean2 = np.array([0, 2]), np.array([2, 0])
         cov = np.array([[1.5, 1.0], [1.0, 1.5]])
-        X1 = np.random.multivariate_normal(mean1, cov, 100)
+
+        X1 = np.random.multivariate_normal(mean1, cov, N_POINTS_FOR_CLASS)
+        X2 = np.random.multivariate_normal(mean2, cov, N_POINTS_FOR_CLASS)
+        
         y1 = np.ones(len(X1))
-        X2 = np.random.multivariate_normal(mean2, cov, 100)
         y2 = np.ones(len(X2)) * -1
+        
         X = np.concatenate((X1, X2))
         Y = np.concatenate((y1, y2)).astype(np.double)
+
         return X, Y
 
     @staticmethod
     def non_linear2():
-        X, y = make_moons(n_samples=100, noise=0)
+        N_POINTS_TOT = 100
+
+        X, y = make_moons(n_samples=N_POINTS_TOT, noise=0)
         y = np.where(y, 1, -1).astype(np.double)
-        return X, y.astype(np.double)
+
+        return X, y
 
     @staticmethod
     def non_linear3():
-        X, y = make_circles(n_samples=100, noise=0)
-        y = np.where(y, 1, -1).astype(np.double)
+        N_POINTS_TOT = 100
+
+        X, y = make_circles(n_samples=N_POINTS_TOT, noise=0)
+        y = np.where(y, 1, -1)
+
         return X, y.astype(np.double)
 
     @staticmethod
     def non_linear4():
-        mean1 = [-1, 2]
-        mean2 = [1, -1]
-        mean3 = [4, -4]
-        mean4 = [-4, 4]
+        N_POINTS_TOT = 100
+        N_POINTS_FOR_CLASS = int(N_POINTS_TOT / 2)
+
+        mean1, mean2, mean3, mean4 = [-1, 2], [1, -1], [4, -4], [-4, 4]
         cov = [[1.0, 0.8], [0.8, 1.0]]
-        X1 = np.random.multivariate_normal(mean1, cov, 50)
-        X1 = np.vstack((X1, np.random.multivariate_normal(mean3, cov, 50)))
+
+        X1 = np.random.multivariate_normal(mean1, cov, int(N_POINTS_FOR_CLASS / 2))
+        X2 = np.random.multivariate_normal(mean2, cov, int(N_POINTS_FOR_CLASS / 2))
+
+        X1 = np.vstack((X1, np.random.multivariate_normal(mean3, cov, int(N_POINTS_FOR_CLASS / 2))))
+        X2 = np.vstack((X2, np.random.multivariate_normal(mean4, cov, int(N_POINTS_FOR_CLASS / 2))))
+
         y1 = np.ones(len(X1))
-        X2 = np.random.multivariate_normal(mean2, cov, 50)
-        X2 = np.vstack((X2, np.random.multivariate_normal(mean4, cov, 50)))
         y2 = np.ones(len(X2)) * -1
+
         X = np.concatenate((X1, X2))
         Y = np.concatenate((y1, y2)).astype(np.double)
+
         return X, Y
 
     @staticmethod
     def random():
-        N_POINTS_TOT = 200
+        N_POINTS_TOT = 100
 
         X = np.random.randn(N_POINTS_TOT, 2)
         Y = np.array([random.choice([-1, 1]) for i in range(N_POINTS_TOT)]).astype(np.double)
