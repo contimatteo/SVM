@@ -151,7 +151,5 @@ if __name__ == "__main__":
     print()
     print(args)
 
-    print()
     main(dataset_index=int(args.dataset) - 1)
-
     print()
