@@ -37,6 +37,10 @@ class SVM():
         return self._sv
 
     @property
+    def support_vectors_Y(self):
+        return self._sv_Y
+
+    @property
     def bias(self):
         return self._bias
 
