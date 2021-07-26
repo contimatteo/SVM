@@ -1,7 +1,7 @@
 import numpy as np
 
-from core.kernel import Kernel
-from core.optimizer import Optimizer
+from libs.kernel import Kernel
+from libs.optimizer import Optimizer
 
 ###
 
@@ -53,27 +53,29 @@ class SVM():
         optimizer = Optimizer()
         optimizer.initialize()
 
-        ###  QP problem solution
+        ### QP problem solution
         solution = None
-        if self.C:
+        if self.C is not None:
             solution = optimizer.cvxopt_soft_margin_solve(Y, self._kernel, self.C)
         else:
             solution = optimizer.cvxopt_hard_margin_solve(Y, self._kernel)
 
-        ###  lagrangian multipliers
+        ### lagrangian multipliers
         self._multipliers = SVMCore.multipliers(solution)
 
         self._sv_idxs = SVMCore.support_vectors_indexes(self._multipliers)
 
-        ###  lambda params (filtered multipliers)
+        ### lambda params (filtered multipliers)
         self._lambdas = self._multipliers[self._sv_idxs]
 
-        ###  support vectors
+        ### support vectors
         self._sv = X[self._sv_idxs]
         self._sv_Y = Y[self._sv_idxs]
 
-        ###  bias
+        ### bias
         self._bias = SVMCore.bias(self._lambdas, self._kernel, self._sv_Y, self._sv_idxs)
+
+        ### +FEATURE: hyperplane coefficients can be pre-computed (only) in the 'linear' case.
 
     def project(self, points):
         return SVMCore.hyperplane_projection(
@@ -117,7 +119,58 @@ class SVMCore():
     @staticmethod
     def bias(lambdas, kernel, Y, sv_idxs):
         """
-        TODO: missing explaination of the following computations
+        given the primal Lagrangian Formulation:
+        `min Lp(w,b)` \\
+        `L(w, b, λ) = (1/2 ||W||^2) - (∑ λi yi (xi • W + b)) + (∑ λi)`
+
+        we obtain the following partial derivate of `L(W,b,λ)` (respect to `W`) \\
+        `𝟃L/𝟃w = W - (∑ λi yi xi)`
+        and the following partial derivate of `L(W,b,λ)` (respect to `b`): \\
+        `𝟃L/𝟃b = 0` \\
+        `∑ λi yi = 0`
+
+        and then by applying the KKT (1) condition (used to have guarantees on the
+        optimality of the result) from the first partial derivate `𝟃L/𝟃w` we get \\
+        `𝟃L/𝟃W = 0` \\
+        `W - (∑ λi yi xi) = 0` \\
+        `W = λ Y X`
+
+        now, we have that any point which:
+         1. satisfies the above `∑ λi yi = 0` condition 
+         2. is a Support Vector `xs`
+        
+        will have the form: \\
+        `ys (xs • W + b) = 1`
+
+        also we can obtain the set `S` of Support Vectors by
+        taking all the  indexes `i` for which `λi > 0`.
+
+        finally, given the set `S`, we can replace `W` with 
+        the above equality (where `m € S`): \\
+        `ys (∑ λm ym xm • xs + b) = 1`
+
+        using an arbitrary Support Vector `xs`, then \\
+        multiplying the above equation by `ys`, using `y^2 = 1`
+        and using the original problem constraint (where `m € S`): \\
+        `∀i . yi (xi • W + b) -1 ≥ 0` \\
+        we obtain: \\
+        `ys^2 (∑ λm ym xm • xs + b) = ys` \\
+        `b = ys - (∑ λm ym xm • xs)`
+
+        instead of using an arbitrary Support Vector `xs`, it is better 
+        to take an average over all of the Support Vectors in `S`.
+        
+        the final formula is (where `m € S`): \\
+        `b =  1/|S|  (∑ ys - (∑ λm ym xm • xs))`
+
+        NON-LINEAR CASE: \\
+
+        hyperplane coefficients `W` formulation slightly change:
+        `W - (∑ λi yi kernel(xi)) = 0` \\
+        `W = (∑ λi yi kernel(xi))`
+
+        and, as a consequence, also `b` formulation change:
+        `b =  1/|S|  (∑ ys - (∑ λm ym kernel(xm) • kernel(xs)))`
         """
         bias = 0
         for n in range(lambdas.shape[0]):
@@ -129,21 +182,20 @@ class SVMCore():
     @staticmethod
     def __hyperplane_linear_coefficients(lambdas, sv, sv_Y):
         """
-        TODO: missing formulation ...
+        LINEAR CASE (only) \\
 
         given the hyperplane equation \\
-        `f(x) = (w * x) + b`
+        `f(x) = (W • x) + b`
 
-        and given the original Lagrangian formulation of our problem
+        and given the primal Lagrangian formulation of our problem, we 
+        obtain the following partial derivate of `L(W,b,λ)` (respect to `W`) \\
+        `𝟃L/𝟃w = W - (∑ λi yi xi)`
 
-        we obtain the following partial derivate of `L(w,b,λ)` (respect to `w`) \\
-        `𝟃L/𝟃w = w - (λ * Y * X)`
-
-        and then by applying the KKT (1) condition (used to have
-        guarantees on the optimality of the result) we get \\
-        `𝟃L/𝟃w = 0` \\
-        `w - (λ * Y * X) = 0` \\
-        `w = λ * Y * X`
+        and then by applying the KKT (1) condition (used to have guarantees on 
+        the optimality of the result) we get \\
+        `𝟃L/𝟃W = 0` \\
+        `W - (∑ λi yi xi) = 0` \\
+        `W = λ Y X`
         """
         X = sv
         Y = sv_Y
@@ -153,7 +205,26 @@ class SVMCore():
     @staticmethod
     def hyperplane_projection(kernel_type, kernel_function, lambdas, sv, sv_Y, bias):
         """
-        TODO: missing formulation ...
+        LINEAR CASE
+        
+        given the hyperplane coefficients `W` and a point `x'` we compute: \\
+        `f(x') = W • x' + b`
+
+        NON-LINEAR CASE \\
+
+        (NB. hyperplane bias `b` formulation depends on hyperplane `W` formulation).
+
+        in this case the hyperplane coefficients `W` formulation directly depend on the `kernel(x')`
+        value (where `x'` are input points and `kernel` is the kernel function to apply). \\
+
+        This because we have: \\
+        `W = (∑ λi yi kernel(xi))` \\
+        and for evaluating a point `x'` we need to compute: \\
+        `x'_proj = W • kernel(x') + b ` \\
+        which results in:
+        `x'_proj = ∑ λi yi kernel(xi, x') + b `
+        
+        As a consequence, we cannot compute `W` a-priori.
         """
         def linear_projection(points):
             coefficients = SVMCore.__hyperplane_linear_coefficients(lambdas, sv, sv_Y)

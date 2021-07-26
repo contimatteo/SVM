@@ -1,5 +1,0 @@
-###
-
-APP_DEBUG = True
-
-RANDOM_SEED = 666
