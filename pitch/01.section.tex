@@ -6,7 +6,7 @@
       \begin{equation*}
         \begin{split}
           \text{min}\ &\ \frac{1}{2} \norm{w}^2 \\
-          \text{s.t.}\ &\ \forall_{i}\ y_i (x_i \cdot w + b)\ \geq\ 0
+          \text{s.t.}\ &\ \forall_{i}\ y_i (x_i \cdot w + b) -1 \geq 0
         \end{split}
       \end{equation*}
     \end{column}
@@ -71,6 +71,8 @@
   subject to:
   \newline
   \begin{equation*}
-    \sum_{i=1}^{L} \alpha_i y_i = 0 \hspace{.5cm} \text{and} \hspace{.5cm} \forall_i\ \alpha_i \geq 0 
+    \sum_{i=1}^{L} \alpha_i y_i = 0 \hspace{.5cm} \text{and} 
+    \hspace{.5cm} 
+    \forall_i\ \alpha_i \geq 0 
   \end{equation*}
 \end{frame}
