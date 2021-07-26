@@ -12,13 +12,15 @@
 \usepackage{xspace}
 \newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
 
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{Support Vector Machine}
-\subtitle{Lagrangian Multiplier and KKT Conditions Formulation}
+\title{SVM Algorithm}
+\subtitle{based on Lagrangian multipliers and KKT conditions}
 \date{\today}
 \author{Matteo Conti}
-% \institute{Center for modern beamer themes}
+\institute{University of Bologna}
 % \titlegraphic{\hfill\includegraphics[height=1.5cm]{logo.pdf}}
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
@@ -34,28 +36,31 @@
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Initial Formulation}
-\include{./sections/01.tex}
+\section{Problem Formulation}
+\include{01.section.tex}
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 
-\section{Final Formulation}
-\include{./sections/02.tex}
-
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-
-\section{Quadratic Programming Optimization}
-\include{./sections/03.tex}
+\section{Quadratic-Programming Optimization}
+\include{02.section.tex}
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 
 \section{Soft-Margin Assumption}
-\include{./sections/04.tex}
+\include{03.section.tex}
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 
 \section{Non-Linear Kernel}
-\include{./sections/05.tex}
+\include{04.section.tex}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+\begin{frame}[standout]
+  \small{
+    \emph{https://github.com/contimatteo/SVM-from-scratch}
+  }
+\end{frame}
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 
