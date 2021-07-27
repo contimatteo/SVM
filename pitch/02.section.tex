@@ -1,0 +1,18 @@
+\begin{frame}[fragile]{Quadratic-Programming Solver}
+  We have used the \emph{cvxopt} Python library in order to obtain the 
+  solutions for our Quadratic-Programming problem.
+  \vspace{.5cm}
+
+  This library solve a problem in the form
+  \begin{equation*}
+    \begin{split}
+      \min_{x}\ &\ \ \frac{1}{2} x^T P x + q^T x \\
+          s.t.\ &\ \ Gx \leq h \\
+              \ &\ \ Ax = b
+    \end{split}
+  \end{equation*}
+  \vspace{.5cm}
+
+  So we've ended up in adapting our $max_{x}\ L_D$ problem to the above formulation
+  in order to find $\alpha_i$ solutions (look at the code for more details).
+\end{frame}
