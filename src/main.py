@@ -122,11 +122,11 @@ def main(dataset_index=None):
 ###
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Matteo Conti - SVM")
+    parser = argparse.ArgumentParser(description="Support Vector Machine (implementation from scratch)")
 
     parser.add_argument(
         "--dataset",
-        help="dataset index to use.",
+        help="index of the dataset to use",
         choices=['1', '2', '3', '4', '5', '6'],
         # default=1,
         required=True
@@ -136,6 +136,5 @@ if __name__ == "__main__":
 
     print()
     print(args)
-
     main(dataset_index=int(args.dataset) - 1)
     print()
